@@ -79,3 +79,8 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return render_template('index.html', name=name, movies=movies)
+
+# 如果你对 CSS 很头疼，可以借助前端框架来完善页面样式，比如 Bootstrap、Semantic-UI、Foundation 等。
+# 它们提供了大量的 CSS 定义和动态效果，使用起来非常简单。
+# 扩展 Bootstrap-Flask 可以简化在 Flask 项目里使用 Bootstrap 4 的步骤。
+# https://github.com/greyli/bootstrap-flask
