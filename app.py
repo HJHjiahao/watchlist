@@ -224,10 +224,10 @@ def inject_user():  # 函数名可以随意修改
 def page_not_found(e):
     return render_template('4046.html'), 404
 
-@app.route('/')
-def index():
-    movies = Movie.query.all()
-    return render_template('index6.html', movies=movies)
+# @app.route('/')
+# def index6():
+#     movies = Movie.query.all()
+#     return render_template('index6.html', movies=movies)
 
 # 基模板中需要在实际的子模板中追加或重写的部分则可以定义成块（block）。
 # 块使用 block 标签创建， {% block 块名称 %} 作为开始标记，{% endblock %} 或 {% endblock 块名称 %} 作为结束标记
@@ -235,3 +235,60 @@ def index():
 
 # 添加了一个新的 <meta> 元素，这个元素会设置页面的视口，让页面根据设备的宽度来自动缩放页面
 # 让移动设备拥有更好的浏览体验; 添加了一个导航栏
+
+# chapter 7 Form https://github.com/greyli/flask-tutorial/blob/master/chapters/c7-form.md
+# 在 <form> 标签里使用 method 属性将提交表单数据的 HTTP 请求方法指定为 POST。如果不指定，则会默认使用 GET 方法，
+# 这会将表单数据通过 URL 提交，容易导致数据泄露，而且不适用于包含大量数据的情况。
+# <input> 元素必须要指定 name 属性，否则无法提交数据，
+# 在服务器端，我们也需要通过这个 name 属性值来获取对应字段的数据
+# <label> 元素不是必须的，只是为了辅助鼠标用户。当使用鼠标点击标签文字时，会自动激活对应的输入框，这对复选框来说比较有用。
+# for 属性填入要绑定的 <input> 元素的 id 属性值。
+from flask import request, url_for, redirect, flash
+
+@app.route('/', methods=['GET', 'POST'])
+def index7():
+    if request.method == 'POST':  # 判断是否是 POST 请求
+        # 获取表单数据
+        title = request.form.get('title')  # 传入表单对应输入字段的 name 值
+        year = request.form.get('year')
+        # 验证数据
+        if not title or not year or len(year) > 4 or len(title) > 60:
+            flash('Invalid input.')  # 显示错误提示
+            return redirect(url_for('index7'))  # 重定向回主页
+        # 保存表单数据到数据库
+        movie = Movie(title=title, year=year)  # 创建记录
+        db.session.add(movie)  # 添加到数据库会话
+        db.session.commit()  # 提交数据库会话
+        flash('Item created.')  # 显示成功创建的提示
+        return redirect(url_for('index7'))  # 重定向回主页
+
+    movies = Movie.query.all()
+    return render_template('index7.html', movies=movies)
+
+@app.route('/movie/edit/<int:movie_id>', methods=['GET', 'POST'])
+def edit(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+
+    if request.method == 'POST':  # 处理编辑表单的提交请求
+        title = request.form['title']
+        year = request.form['year']
+        
+        if not title or not year or len(year) != 4 or len(title) > 60:
+            flash('Invalid input.')
+            return redirect(url_for('edit', movie_id=movie_id))  # 重定向回对应的编辑页面
+        
+        movie.title = title  # 更新标题
+        movie.year = year  # 更新年份
+        db.session.commit()  # 提交数据库会话
+        flash('Item updated.')
+        return redirect(url_for('index'))  # 重定向回主页
+    
+    return render_template('edit.html', movie=movie)  # 传入被编辑的电影记录
+
+@app.route('/movie/delete/<int:movie_id>', methods=['POST'])  # 限定只接受 POST 请求
+def delete(movie_id):
+    movie = Movie.query.get_or_404(movie_id)  # 获取电影记录
+    db.session.delete(movie)  # 删除对应的记录
+    db.session.commit()  # 提交数据库会话
+    flash('Item deleted.')
+    return redirect(url_for('index'))  # 重定向回主页
