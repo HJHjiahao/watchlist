@@ -1,11 +1,9 @@
 # print(1) https://github.com/greyli/flask-tutorial/blob/master/chapters
-
+from flask import Flask
+app = Flask(__name__)
 # chapter 2 Hello https://github.com/greyli/flask-tutorial/blob/master/chapters/c2-hello.md
 # http://127.0.0.1:5000   http://localhost:5000 
 '''
-from flask import Flask
-app = Flask(__name__)
-
 @app.route('/') # consistent with the tail of link
 # @app.route('/home')
 def hello():
@@ -50,8 +48,7 @@ movies = [
     {'title': 'The Pork of Music', 'year': '2012'},
 ]
 
-from flask import Flask, render_template
-app = Flask(__name__)
+from flask import render_template
 
 @app.route('/')
 def index():
@@ -74,8 +71,7 @@ movies = [
     {'title': 'The Pork of Music', 'year': '2012'},
 ]
 
-from flask import Flask, render_template
-app = Flask(__name__)
+from flask import render_template
 
 @app.route('/')
 def index():
@@ -92,8 +88,6 @@ def index():
 # 通过对这个类进行各种操作来代替写 SQL 语句。这个类我们称之为模型类，类中的属性我们将称之为字段。
 # 可使用一个叫做 Flask-SQLAlchemy 的官方扩展来集成 SQLAlchemy pip install flask-sqlalchemy
 from flask_sqlalchemy import SQLAlchemy  # 导入扩展类
-from flask import Flask
-app = Flask(__name__)
 db = SQLAlchemy(app)  # 初始化扩展，传入程序实例 app
 
 # Flask 提供了一个统一的接口来写入和获取这些配置变量：Flask.config 字典。
@@ -182,11 +176,11 @@ def initdb(drop):
 # >>> db.session.commit()  # 提交改动
 from flask import render_template
 # 程序内修改
-@app.route('/')
-def index():
-    user = User.query.first()  # 读取用户记录
-    movies = Movie.query.all()  # 读取所有电影记录
-    return render_template('index.html', user=user, movies=movies)
+# @app.route('/')
+# def index():
+#     user = User.query.first()  # 读取用户记录
+#     movies = Movie.query.all()  # 读取所有电影记录
+#     return render_template('index.html', user=user, movies=movies)
 
 import click
 
@@ -219,3 +213,25 @@ def forge():
     db.session.commit()
     click.echo('Done.')
 
+# chapter 6 Template2 https://github.com/greyli/flask-tutorial/blob/master/chapters/c6-template2.md
+
+@app.context_processor
+def inject_user():  # 函数名可以随意修改
+    user = User.query.first()
+    return dict(user=user)  # 需要返回字典，等同于 return {'user': user}
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('4046.html'), 404
+
+@app.route('/')
+def index():
+    movies = Movie.query.all()
+    return render_template('index6.html', movies=movies)
+
+# 基模板中需要在实际的子模板中追加或重写的部分则可以定义成块（block）。
+# 块使用 block 标签创建， {% block 块名称 %} 作为开始标记，{% endblock %} 或 {% endblock 块名称 %} 作为结束标记
+# 默认的块重写行为是覆盖，如果你想向父块里追加内容，可以在子块中使用 super() 声明，即 {{ super() }}
+
+# 添加了一个新的 <meta> 元素，这个元素会设置页面的视口，让页面根据设备的宽度来自动缩放页面
+# 让移动设备拥有更好的浏览体验; 添加了一个导航栏
