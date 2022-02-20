@@ -285,7 +285,7 @@ def edit(movie_id):
         movie.year = year  # 更新年份
         db.session.commit()  # 提交数据库会话
         flash('Item updated.')
-        return redirect(url_for('index'))  # 重定向回主页
+        return redirect(url_for('index7'))  # 重定向回主页
     
     return render_template('edit.html', movie=movie)  # 传入被编辑的电影记录
 
@@ -296,7 +296,7 @@ def delete(movie_id):
     db.session.delete(movie)  # 删除对应的记录
     db.session.commit()  # 提交数据库会话
     flash('Item deleted.')
-    return redirect(url_for('index'))  # 重定向回主页
+    return redirect(url_for('index7'))  # 重定向回主页
 
 # chapter 8 Login https://github.com/greyli/flask-tutorial/blob/master/chapters/c8-login.md
 # Flask 的依赖 Werkzeug 内置了用于生成和验证密码散列值的函数，werkzeug.security.generate_password_hash() 用来为给定的密码生成密码散列值，
@@ -403,6 +403,8 @@ def settings():
         return redirect(url_for('index7'))
     
     return render_template('settings.html')
+
+# chapter 9 Test https://github.com/greyli/flask-tutorial/blob/master/chapters/c9-test.md
 
 
 
