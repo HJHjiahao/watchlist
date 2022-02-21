@@ -405,7 +405,9 @@ def settings():
     return render_template('settings.html')
 
 # chapter 9 Test https://github.com/greyli/flask-tutorial/blob/master/chapters/c9-test.md
+# in test_watchlist.py
 
+# chapter 10 Organize https://github.com/greyli/flask-tutorial/blob/master/chapters/c10-organize.md
 
 
 
